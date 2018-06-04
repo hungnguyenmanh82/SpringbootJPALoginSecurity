@@ -22,10 +22,16 @@ public class MainController {
         return "welcomePage";   // welcomePage.html
     }
  
+    /**
+     * để vào đc "/admin" phải có quyền admin.
+     * 
+     * Nếu ko có quyền admin thì sẽ nhảy vào trang "/login"
+     */
     @RequestMapping(value = "/admin", method = RequestMethod.GET)
     public String adminPage(Model model, Principal principal) {
          
-        User loginedUser = (User) ((Authentication) principal).getPrincipal();
+        // Principal class chuyên phụ trách các vấn đề security
+    	User loginedUser = (User) ((Authentication) principal).getPrincipal();
  
         String userInfo = WebUtils.toString(loginedUser);
         model.addAttribute("userInfo", userInfo);
@@ -45,9 +51,13 @@ public class MainController {
         return "logoutSuccessfulPage";
     }
  
+    /**
+     * để vào "/userinfo" thì phải login 1 user nào đó trc 
+     */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public String userInfo(Model model, Principal principal) {
  
+    	// Principal class chuyên phụ trách các vấn đề security
         // After user login successfully.
         String userName = principal.getName();
  

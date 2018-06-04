@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import com.example.demo.service.UserDetailsServiceImpl;
 
 /**
- * đây chỉ là config thôi.
+ * đây chỉ là config thôi. Phần kiểm xoat security thực sự là do HttpSecurity
  *
  */
 @Configuration
@@ -53,6 +53,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		System.out.println(" ************** step3: WebSecurityConfig " );
 		
+		/**
+		 * HttpSecurity  sẽ đóng vai trò bộ lọc và xử lý các vấn để security
+		 */
 		http.csrf().disable();
 
 		// The pages does not require login
@@ -72,8 +75,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// Config for Login Form
 		http.authorizeRequests().and().formLogin()//
-		// Submit URL of login page.
-		.loginProcessingUrl("/j_spring_security_check") // Submit URL
+		// Submit URL of login page
+		.loginProcessingUrl("/j_spring_security_check") // POST html request from HTML form in LoginPage.html
 		.loginPage("/login")//
 		.defaultSuccessUrl("/userAccountInfo")//
 		.failureUrl("/login?error=true")//
