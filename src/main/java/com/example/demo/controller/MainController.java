@@ -30,7 +30,9 @@ public class MainController {
     @RequestMapping(value = "/admin", method = RequestMethod.GET)
     public String adminPage(Model model, Principal principal) {
          
-        // Principal class chuyên phụ trách các vấn đề security
+    	// "Principal" class chuyên phụ trách các vấn đề security => để lấy thông tin User đã đăng nhập
+        // After user login successfully.
+    	//từ User name ta có thể lấy lại thông tin user từ database dễ dàng
     	User loginedUser = (User) ((Authentication) principal).getPrincipal();
  
         String userInfo = WebUtils.toString(loginedUser);
@@ -57,8 +59,9 @@ public class MainController {
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public String userInfo(Model model, Principal principal) {
  
-    	// Principal class chuyên phụ trách các vấn đề security
+    	// "Principal" class chuyên phụ trách các vấn đề security => để lấy thông tin User đã đăng nhập
         // After user login successfully.
+    	//từ User name ta có thể lấy lại thông tin user từ database dễ dàng
         String userName = principal.getName();
  
         System.out.println("User Name: " + userName);
