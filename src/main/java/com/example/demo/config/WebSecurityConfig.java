@@ -24,7 +24,7 @@ import com.example.demo.service.UserDetailsServiceImpl;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	private UserDetailsServiceImpl userDetailsService; 
+	private UserDetailsServiceImpl userDetailsService; //lấy thông tin user từ Database
 	
 	@Autowired
 	private DataSource dataSource;
@@ -40,8 +40,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
-		// Setting Service to find User in the database.
-		// And Setting PassswordEncoder
+		// step1: find user in userDetailsService
+		// step2: passwordEncoder sẽ cung cấp function để kiểm tra 2 password có giống nhau ko
+		//        BCryptPasswordEncoder.matches(CharSequence rawPassword, String encodedPassword) 
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 		
 		System.out.println(" ************** step2: WebSecurityConfig " );
@@ -73,13 +74,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// AccessDeniedException will be thrown.
 		http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/403");
 
+		// Springboot Security nhớ cả URL trc khi gọi login để quay trở lại nó khi login thành công:  /userInfo và /admin
+		// mỗi khi có /j_spring_security_check thì Springboot lại gọi userDetailsService để check security
 		// Config for Login Form
+		// .and()  là bắt đầu 1 filter mới
 		http.authorizeRequests().and().formLogin()//
 		// Submit URL of login page
 		.loginProcessingUrl("/j_spring_security_check") // POST html request from HTML form in LoginPage.html
-		.loginPage("/login")//
-		.defaultSuccessUrl("/userAccountInfo")//
-		.failureUrl("/login?error=true")//
+		.loginPage("/login")              // nếu "/userInfo", "/admin" mà chưa đăng nhập thì nhảy vào page này
+		.defaultSuccessUrl("/userInfo")  // khi thành công nó sẽ nhảy vào URL trc khi gọi /login là: /userInfo và /admin
+		.failureUrl("/login?error=true") // nếu "/j_spring_security_check" fail thì sẽ nhảy vào page này
 		.usernameParameter("username")//
 		.passwordParameter("password")
 		// Config for Logout Page

@@ -16,7 +16,12 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dao.AppRoleDAO;
 import com.example.demo.dao.AppUserDAO;
 import com.example.demo.entity.AppUser;
- 
+
+/**
+ * Class này đc Spring Security gọi runtime để lấy thông tin về user check user/password
+ * vd: 1 user login vào hệ thống 
+ *
+ */
 @Service  //singleton
 public class UserDetailsServiceImpl implements UserDetailsService {
  
@@ -26,6 +31,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private AppRoleDAO appRoleDAO;
  
+    /**
+     * Lấy thông tin user từ database
+     */
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         AppUser appUser = this.appUserDAO.findUserAccount(userName);
