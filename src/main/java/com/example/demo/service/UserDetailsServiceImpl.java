@@ -25,10 +25,10 @@ import com.example.demo.entity.AppUser;
 @Service  //singleton
 public class UserDetailsServiceImpl implements UserDetailsService {
  
-    @Autowired
+    @Autowired  //refer to singleton
     private AppUserDAO appUserDAO;
  
-    @Autowired
+    @Autowired //refer to singleton
     private AppRoleDAO appRoleDAO;
  
     /**

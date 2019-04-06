@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 
 import java.security.Principal;
- 
+
+import javax.servlet.http.HttpSession;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -57,7 +59,7 @@ public class MainController {
      * để vào "/userinfo" thì phải login 1 user nào đó trc 
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
-    public String userInfo(Model model, Principal principal) {
+    public String userInfo(Model model, Principal principal,HttpSession session) {
  
     	// "Principal" class chuyên phụ trách các vấn đề security => để lấy thông tin User đã đăng nhập
         // After user login successfully.
@@ -70,6 +72,9 @@ public class MainController {
  
         String userInfo = WebUtils.toString(loginedUser);
         model.addAttribute("userInfo", userInfo);
+        //==================================================
+        String sessionId = session.getId();  
+        System.out.println("[session-id]: " + sessionId); 
  
         return "userInfoPage";
     }

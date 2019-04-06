@@ -17,7 +17,7 @@ import com.example.demo.service.UserDetailsServiceImpl;
 
 /**
  * đây chỉ là config thôi. Phần kiểm xoat security thực sự là do HttpSecurity
- *
+ * Thư viện sessionId là của Springboot (ko phải của Servlet)
  */
 @Configuration
 @EnableWebSecurity
