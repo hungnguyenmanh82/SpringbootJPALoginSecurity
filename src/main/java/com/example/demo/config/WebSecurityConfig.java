@@ -56,10 +56,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	/*=======================================================================================
-	 * @Autowired: hàm này đc gọi lúc khởi tạo instance của Class này
+	 * @Autowired: hàm này đc gọi lúc khởi tạo instance của Class này => vì thế gọi hàm này trc hàm config()
 	 * AuthenticationManagerBuilder bean là singleton.
-	 * dùng AuthenticationManagerBuilder với Dependency Injection parameter để truyền tham số vào hệ thống.
-	 * Interface chuẩn của Springboot Security
+	 * dùng AuthenticationManagerBuilder với Dependency Injection parameter để truyền tham số vào hệ thống với Interface chuẩn của Springboot Security
+	 * 
+	 * Tóm lại: dùng AuthenticationManagerBuilder singleton và hàm configure() của WebSecurityConfigurerAdapter để thiết lập Security
 	 *=========================================================================================
 	 */
 	@Autowired //refer to Bean singleton của Springboot Security để Overide
