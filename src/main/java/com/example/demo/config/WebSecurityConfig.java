@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -16,8 +17,11 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import com.example.demo.service.UserDetailsServiceImpl;
 
 /**
- * đây chỉ là config thôi. Phần kiểm soat security thực sự là do HttpSecurity
- * Thư viện sessionId là của Springboot (ko phải của Servlet)
+ * trong vd này: Springboot security vẫn dùng sessionId  lấy của Servlet.
+ * Tuy nhiên có thể config dùng sessionId độc lập với Servlet. Phần config session là độc lập với phần Springboot Security dưới đây.
+ *  https://docs.spring.io/spring-session/docs/current/reference/html5/
+ * 
+ *  Tóm lại: dùng AuthenticationManagerBuilder singleton và hàm configure() của WebSecurityConfigurerAdapter để thiết lập Security
  */
 @Configuration    //thay cho file bean.xml => class này chứa Bean cần khởi tạo.
 @EnableWebSecurity  //Springboot Security sẽ gọi singleton nay
@@ -30,11 +34,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	//============================================================================
 	@Autowired  //refer to singleton
 	private UserDetailsServiceImpl userDetailsService; //lấy thông tin user từ Database
-	
+
 	@Autowired  //refer to Bean singleton
 	private DataSource dataSource;
 
-	
+
 	@Bean    //Mặc định nếu @bean ko khai báo @scope thì là singleton.
 	public BCryptPasswordEncoder passwordEncoder() {
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -43,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 
-	
+
 	/**
 	 * gắn cố định token với user.
 	 * Phần này ko nên dùng
@@ -54,7 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		db.setDataSource(dataSource);
 		return db;
 	}
-	
+
 	/*=======================================================================================
 	 * @Autowired: hàm này đc gọi lúc khởi tạo instance của Class này => vì thế gọi hàm này trc hàm config()
 	 * AuthenticationManagerBuilder bean là singleton.
@@ -70,10 +74,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// step2: passwordEncoder sẽ cung cấp function để kiểm tra 2 password có giống nhau ko
 		//        BCryptPasswordEncoder.matches(CharSequence rawPassword, String encodedPassword) 
 		auth.userDetailsService(userDetailsService)
-			.passwordEncoder(passwordEncoder());
-		
+		    .passwordEncoder(passwordEncoder());
+
 		System.out.println(" ************** step2: WebSecurityConfig " );
 	}
+
+/*	// for testing
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		//thông tin authen đc lưu ở memory
+		auth.inMemoryAuthentication()
+		     .withUser(User
+				.withDefaultPasswordEncoder()
+			     .username("user")
+			     .password("password")
+				 .roles("ADMIN")
+				.build());  //User.class là builder để build UserDetails
+	}
+*/
 	
 	/*=======================================================================================
 	 * 
@@ -85,7 +103,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		System.out.println(" ************** step3: WebSecurityConfig " );
-		
+
 		/**
 		 * HttpSecurity  sẽ đóng vai trò bộ lọc và xử lý các vấn để security
 		 */
