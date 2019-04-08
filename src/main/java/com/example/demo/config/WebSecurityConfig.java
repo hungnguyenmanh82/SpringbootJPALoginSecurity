@@ -16,28 +16,33 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import com.example.demo.service.UserDetailsServiceImpl;
 
 /**
- * đây chỉ là config thôi. Phần kiểm xoat security thực sự là do HttpSecurity
+ * đây chỉ là config thôi. Phần kiểm soat security thực sự là do HttpSecurity
  * Thư viện sessionId là của Springboot (ko phải của Servlet)
  */
-@Configuration
+@Configuration    //thay cho file bean.xml => class này chứa Bean cần khởi tạo.
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
+	//============================================================================
+	//
+	// Các Bean dưới đây để cung câp thong tin cho Springboot Security thôi
+	//
+	//============================================================================
+	@Autowired  //refer to singleton
 	private UserDetailsServiceImpl userDetailsService; //lấy thông tin user từ Database
 	
-	@Autowired
+	@Autowired  //refer to Bean singleton
 	private DataSource dataSource;
 
-
-	@Bean
+	
+	@Bean    //Mặc định nếu @bean ko khai báo @scope thì là singleton.
 	public BCryptPasswordEncoder passwordEncoder() {
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 		System.out.println(" ************** step1: WebSecurityConfig " );
 		return bCryptPasswordEncoder;
 	}
 
-	@Autowired
+	@Autowired //refer to Bean singleton
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
 		// step1: find user in userDetailsService
@@ -48,7 +53,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		System.out.println(" ************** step2: WebSecurityConfig " );
 	}
 	
+	/**
+	 * Luu ý thông tin lưu ở Database
+	 */
+	@Bean //Mặc định nếu @bean ko khai báo @scope thì là singleton.
+	public PersistentTokenRepository persistentTokenRepository() {
+		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
+		db.setDataSource(dataSource);
+		return db;
+	}
 	
+	/*=======================================================================================
+	 * 
+	 * Tất cả config là ở hàm @Overide này. 
+	 * Các @Bean ở trên là để cung cấp thông tin cho phần config trong function này
+	 *=========================================================================================
+	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
@@ -96,11 +116,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	}
 
-	@Bean
-	public PersistentTokenRepository persistentTokenRepository() {
-		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
-		db.setDataSource(dataSource);
-		return db;
-	}
+
 
 }

@@ -21,7 +21,7 @@ public class AppUser {
 	private long userId;
 	private String userName;
 	private String encrytedPassword;
-	private boolean enabled;
+	private boolean enabled; 
 	private Set<UserRole> userRoles = new HashSet<UserRole>(0);
 
 	public AppUser() {
