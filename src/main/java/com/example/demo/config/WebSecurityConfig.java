@@ -20,7 +20,7 @@ import com.example.demo.service.UserDetailsServiceImpl;
  * Thư viện sessionId là của Springboot (ko phải của Servlet)
  */
 @Configuration    //thay cho file bean.xml => class này chứa Bean cần khởi tạo.
-@EnableWebSecurity
+@EnableWebSecurity  //Springboot Security sẽ gọi singleton nay
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	//============================================================================
@@ -42,25 +42,36 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return bCryptPasswordEncoder;
 	}
 
-	@Autowired //refer to Bean singleton
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
-		// step1: find user in userDetailsService
-		// step2: passwordEncoder sẽ cung cấp function để kiểm tra 2 password có giống nhau ko
-		//        BCryptPasswordEncoder.matches(CharSequence rawPassword, String encodedPassword) 
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-		
-		System.out.println(" ************** step2: WebSecurityConfig " );
-	}
 	
 	/**
-	 * Luu ý thông tin lưu ở Database
+	 * gắn cố định token với user.
+	 * Phần này ko nên dùng
 	 */
 	@Bean //Mặc định nếu @bean ko khai báo @scope thì là singleton.
 	public PersistentTokenRepository persistentTokenRepository() {
 		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
 		db.setDataSource(dataSource);
 		return db;
+	}
+	
+	/*=======================================================================================
+	 * @Autowired: hàm này đc gọi lúc khởi tạo instance của Class này
+	 * AuthenticationManagerBuilder bean là singleton.
+	 * dùng AuthenticationManagerBuilder với Dependency Injection parameter để truyền tham số vào hệ thống.
+	 * Interface chuẩn của Springboot Security
+	 *=========================================================================================
+	 */
+	@Autowired //refer to Bean singleton của Springboot Security để Overide
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+
+		// step1: find user in userDetailsService
+		// step2: passwordEncoder sẽ cung cấp function để kiểm tra 2 password có giống nhau ko
+		//        BCryptPasswordEncoder.matches(CharSequence rawPassword, String encodedPassword) 
+		auth.userDetailsService(userDetailsService)
+			.passwordEncoder(passwordEncoder());
+		
+		System.out.println(" ************** step2: WebSecurityConfig " );
 	}
 	
 	/*=======================================================================================
@@ -104,8 +115,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.loginPage("/login")              // nếu "/userInfo", "/admin" mà chưa đăng nhập thì nhảy vào page này
 		.defaultSuccessUrl("/userInfo")  // khi thành công nó sẽ nhảy vào URL trc khi gọi /login là: /userInfo và /admin
 		.failureUrl("/login?error=true") // nếu "/j_spring_security_check" fail thì sẽ nhảy vào page này
-		.usernameParameter("username")//
-		.passwordParameter("password")
+		.usernameParameter("username")  	// "username" field trong url = /login
+		.passwordParameter("password")		// "password" field trong url = /login
 		// Config for Logout Page
 		.and().logout().logoutUrl("/logout").logoutSuccessUrl("/logoutSuccessful");
 

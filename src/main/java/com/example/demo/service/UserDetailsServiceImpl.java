@@ -18,8 +18,9 @@ import com.example.demo.dao.AppUserDAO;
 import com.example.demo.entity.AppUser;
 
 /**
- * Class này đc Spring Security gọi runtime để lấy thông tin về user check user/password
- * vd: 1 user login vào hệ thống 
+ * UserDetailsService: là service interface của SpringBoot để lấy thông tin user, khi user login vào hệ thống
+ * 
+ * Ta override interface này để cung cấp thông tin cho Springboot Security
  *
  */
 @Service  //singleton
@@ -32,12 +33,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private AppRoleDAO appRoleDAO;
  
     /**
-     * Lấy thông tin user từ database
+     * Lấy thông tin user từ database => cung cấp cho SpringBoot ở đây
+     * @userName: là thông tin ở "username" field trong url = "\login" trả về cho Springboot Security
      */
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+    	//step1: userName trả về từ "\login" form of POST request
+    	
+    	//step2: lấy thông tin user từ data base (or từ đâu đó tùy ý. vd: hard code ở đây vẫn ok)
         AppUser appUser = this.appUserDAO.findUserAccount(userName);
  
+        //validate User
         if (appUser == null) {
             System.out.println("User not found! " + userName);
             throw new UsernameNotFoundException("User " + userName + " was not found in the database");
@@ -45,9 +51,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
  
         System.out.println("Found User: " + appUser);
  
+        //step3: get Roles of User từ Database (or từ đâu đó tùy ý. vd: hard code ở đây vẫn ok)
         // [ROLE_USER, ROLE_ADMIN,..]
         List<String> roleNames = this.appRoleDAO.getRoleNames(appUser.getUserId());
  
+        //step4: convert User and Role of User to Springboot format Which is  UserDetails
         List<GrantedAuthority> grantList = new ArrayList<GrantedAuthority>();
         if (roleNames != null) {
             for (String role : roleNames) {
