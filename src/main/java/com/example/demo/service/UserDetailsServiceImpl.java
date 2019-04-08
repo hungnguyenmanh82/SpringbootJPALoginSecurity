@@ -18,9 +18,9 @@ import com.example.demo.dao.AppUserDAO;
 import com.example.demo.entity.AppUser;
 
 /**
- * UserDetailsService: là service interface của SpringBoot để lấy thông tin user, khi user login vào hệ thống
+ * *  Tóm lại: dùng AuthenticationManagerBuilder singleton và hàm @override configure() của WebSecurityConfigurerAdapter để thiết lập Security.
  * 
- * Ta override interface này để cung cấp thông tin cho Springboot Security
+ *  UserDetailsService singleton là đầu vào của AuthenticationManagerBuilder singleton  (Dependency Injection)
  *
  */
 @Service  //singleton
@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
  
     /**
      * Lấy thông tin user từ database => cung cấp cho SpringBoot ở đây
-     * @userName: là thông tin ở "username" field trong url = "\login" trả về cho Springboot Security
+     * @userName: là thông tin ở "username" field trong url = "\login" POST request trả về cho Springboot Security
      */
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -65,6 +65,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             }
         }
  
+        // nếu để encrypted pass thì String sẽ dài => ????
         UserDetails userDetails = (UserDetails) new User(appUser.getUserName(), //
                 appUser.getEncrytedPassword(), grantList);
  
