@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
@@ -33,24 +34,62 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	//
 	//============================================================================
 	@Autowired  //refer to singleton
-	private UserDetailsServiceImpl userDetailsService; //lấy thông tin user từ Database
+	private UserDetailsServiceImpl userDetailsService; //lấy thông tin user từ Database => convert sang định dạng Spring Security
 
 	@Autowired  //refer to Bean singleton
 	private DataSource dataSource;
 
 
+	//implement encoder password => dùng thư viện có sẵn
 	@Bean    //Mặc định nếu @bean ko khai báo @scope thì là singleton.
-	public BCryptPasswordEncoder passwordEncoder() {
+	public PasswordEncoder passwordEncoder() {
+		// dùng thư viện có sẵn
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-		System.out.println(" ************** step1: WebSecurityConfig " );
+
 		return bCryptPasswordEncoder;
 	}
 
+	//implement encoder password => Tự tạo ra để cung cấp cho Springboot
+	@Bean    //Mặc định nếu @bean ko khai báo @scope thì là singleton.
+	public PasswordEncoder passwordEncoder2() {
+		
+		//implement encoder của riêng mình
+		PasswordEncoder encoder = new PasswordEncoder() {
+			//Springboot Security dùng hàm này. ko dùng hàm encode()
+			@Override
+			public boolean matches(CharSequence rawPassword, String encodedPassword) {
+				//step1: encoder rawPassword
+				
+				//step2: so sánh pass sau khi mã hóa với encodedPassword
+				
+				return false;
+			}
+			
+			//hàm này để ta encode mỗi khi lưu vào database. Springboot Security ko dùng hàm này.
+			@Override
+			public String encode(CharSequence rawPassword) {
+				//giải thuật encode để trả về String encode
+				return null;
+			}
+		};
+		
+		return encoder;
+	}
 
 
 	/**
-	 * gắn cố định token với user.
-	 * Phần này ko nên dùng
+	 * Bỏ tính năng PersistenToken cũng ko sao. Lưu ở Database sẽ làm chậm performance.
+	 * 
+	 * Nếu user chọn "Remember Me" option khi login thì sẽ cấp cho nó 1 token (khác với SessionId) ở cookies.
+	 * SessionID này có timeout dài hơn SessionId và lưu ở Database.
+	 * 
+	 * User có thể dùng token này để đăng nhập mà ko cần SessionId (xóa SessionID ok) => nói chung ko ổn về security.
+	 * JdbcTokenRepositoryImpl sẽ tạo tự động tạo table ở Database để lưu trữ Token. Chỉ cần cung cấp datasource cho nó là ok.
+	 * 
+	 * dataSource là singleton của Springboot đã lấy thông tin ở trong application.properties để tạo ra nhằm kết nối database.
+	 * Nếu có nhiều database thì sẽ có nhiều DataSource tương ứng.
+	 *  https://www.youtube.com/watch?v=N5Q42VvLBLM
+	 * 
 	 */
 	@Bean //Mặc định nếu @bean ko khai báo @scope thì là singleton.
 	public PersistentTokenRepository persistentTokenRepository() {
@@ -79,7 +118,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		System.out.println(" ************** step2: WebSecurityConfig " );
 	}
 
-/*	// for testing
+/*	// for testing => để tránh việc thiết kế database
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		//thông tin authen đc lưu ở memory
@@ -105,7 +144,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		System.out.println(" ************** step3: WebSecurityConfig " );
 
 		/**
-		 * HttpSecurity  sẽ đóng vai trò bộ lọc và xử lý các vấn để security
+		 * HttpSecurity  sẽ đóng vai trò interceptor và xử lý các vấn để security
 		 */
 		http.csrf().disable();
 
@@ -141,8 +180,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// Config Remember Me.
 		http.authorizeRequests().and() //
-		.rememberMe().tokenRepository(this.persistentTokenRepository()) //
-		.tokenValiditySeconds(1 * 24 * 60 * 60); // 24h
+		.rememberMe().tokenRepository(this.persistentTokenRepository()) // 
+		.tokenValiditySeconds(1 * 24 * 60 * 60); // 24h là expire của persitentToken (ko phải của SessionId).
 
 	}
 
