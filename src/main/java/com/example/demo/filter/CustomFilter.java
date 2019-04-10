@@ -13,6 +13,7 @@ import org.springframework.web.filter.GenericFilterBean;
 
 /**
  * Đây là filter trên Servlet => nen dung code nhu Servlet: forward, redirect, include...
+ * Có thể dùng wraper response/request giống hệt filter ở Servlet
  *
  */
 public class CustomFilter extends GenericFilterBean {
@@ -33,6 +34,7 @@ public class CustomFilter extends GenericFilterBean {
     	}else if(uri.equals("/testfilter")){
     		((HttpServletRequest)request).getRequestDispatcher("/forwardTest").forward(request, response);
     	}else{
+    		//có thể dùng Wraper response/request ở đây
     		chain.doFilter(request, response); //cho request đi qua
     	}
         
