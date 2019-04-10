@@ -32,4 +32,16 @@ public class SessionIdController {
 
         return sessionId;
     }
+    
+    @RequestMapping(value = "/forwardTest", method = RequestMethod.GET)
+    public String testFilter(Model model) {
+  
+        return "forwardTest";
+    }
+    
+    @RequestMapping(value = "/testfilter", method = RequestMethod.GET)
+    public String startFilter(Model model) {
+  
+        return "welcomePage";
+    }
 }

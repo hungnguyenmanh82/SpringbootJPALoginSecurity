@@ -14,7 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.example.demo.filter.CustomFilter;
 import com.example.demo.service.UserDetailsServiceImpl;
 
 /**
@@ -147,16 +149,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		 * HttpSecurity  sẽ đóng vai trò interceptor và xử lý các vấn để security
 		 */
 		http.csrf().disable();
+		
+		//add filter (or interceptor)
+		http.addFilterBefore(new CustomFilter() , BasicAuthenticationFilter.class);
 
 		// The pages does not require login
-		http.authorizeRequests().antMatchers("/", "/login", "/logout").permitAll();
+		http.authorizeRequests().antMatchers("/", "/login", "/logout","/forwardTest","/testfilter").permitAll();
 
 		// /userInfo page requires login as ROLE_USER or ROLE_ADMIN.
 		// If no login, it will redirect to /login page.
-		http.authorizeRequests().antMatchers("/userInfo").access("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')");
+//		http.authorizeRequests().antMatchers("/userInfo").access("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')");
+		http.authorizeRequests().antMatchers("/userInfo").hasAnyRole("ROLE_USER","ROLE_ADMIN");
 
 		// For ADMIN only.
-		http.authorizeRequests().antMatchers("/admin").access("hasRole('ROLE_ADMIN')");
+//		http.authorizeRequests().antMatchers("/admin").access("hasRole('ROLE_ADMIN')");
+		http.authorizeRequests().antMatchers("/admin").hasAnyRole("ROLE_ADMIN");
 
 		// When the user has logged in as XX.
 		// But access a page that requires role YY,
