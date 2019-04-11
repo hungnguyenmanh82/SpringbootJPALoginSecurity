@@ -17,7 +17,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import com.example.demo.utils.WebUtils;
 
 /**
- * Springboot security sử dụng HttpSession của Servlet => trên các @controller thì SessionId lấy từ cookies đều giống nhau (đã test)
+ * Tạo ra các request để test filter of Springboot Security.
+ * filter is CustomeFilter.class
  *
  */
 @Controller
