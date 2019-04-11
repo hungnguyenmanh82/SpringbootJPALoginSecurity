@@ -23,25 +23,15 @@ import com.example.demo.utils.WebUtils;
 @Controller
 public class SessionIdController {
   
-    //================================ test: GET and POST ======================================   
+
     @RequestMapping(path = "/get", method = RequestMethod.GET)
     @ResponseBody    //de tra ve kieu String
-    public String testGetRequest(HttpSession session){
-    	
+    public String testSessionId(HttpSession session){    	
     	String sessionId = "SessionId = " + session.getId();
 
         return sessionId;
     }
     
-    @RequestMapping(value = "/forwardTest", method = RequestMethod.GET)
-    public String testFilter(Model model) {
-  
-        return "forwardTest";
-    }
-    
-    @RequestMapping(value = "/testfilter", method = RequestMethod.GET)
-    public String startFilter(Model model) {
-  
-        return "welcomePage";
-    }
+   
+
 }

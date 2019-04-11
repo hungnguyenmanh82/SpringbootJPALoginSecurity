@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+ 
+   <head>
+      <meta charset="UTF-8" />
+      <title> Security filter example</title>
+   </head>
+ 
+   <body>
+ 	  <h1> Here is content of "/forwardTest.html"</h1>	
+      <h3>CustomeFilter.class: filter of Springboot Security</h3>
+      <span style="color:blue;">      filter "/filterForward" then forward to "/forwardTest.html""</span>
+      <br/><br/>
+      <br/><br/>
+ 
+ 
+      <a th:href="@{/}">Home</a>
+      <br/><br/>
+      <a th:href="@{/filterRedirect}"> test filter: redirect "/filterRedirect" to "redirectTest.html "</a>
+ 
+   </body>
+</html>

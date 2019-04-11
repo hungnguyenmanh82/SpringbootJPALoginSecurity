@@ -82,10 +82,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	/**
 	 * Bỏ tính năng PersistenToken cũng ko sao. Lưu ở Database sẽ làm chậm performance.
 	 * 
-	 * Nếu user chọn "Remember Me" option khi login thì sẽ cấp cho nó 1 token (khác với SessionId) ở cookies.
+	 * Nếu user chọn "Remember Me" option khi login thì sẽ cấp cho nó 1 token (khác với SessionId: JSESSIONID) ở cookies.
 	 * SessionID này có timeout dài hơn SessionId và lưu ở Database.
 	 * 
-	 * User có thể dùng token này để đăng nhập mà ko cần SessionId (xóa SessionID ok) => nói chung ko ổn về security.
+	 * User có thể dùng token này để đăng nhập mà ko cần SessionId (xóa SessionID ok) => 
+	 * nếu xóa JSESSIONID đi mà "remember-me" vẫn chưa expire thì khi đăng nhập Springboot sẽ check persistent_logins table => nếu tồn tại nó cấp JSESSIONID mới (tested)
+	 *  JSESSIONID lưu ở RAM để check thuong xuyen
+	 *  trong khi "remember-me" lưu ở Database và chỉ check khi login thôi
+	 *  
 	 * JdbcTokenRepositoryImpl sẽ tạo tự động tạo table ở Database để lưu trữ Token. Chỉ cần cung cấp datasource cho nó là ok.
 	 * 
 	 * dataSource là singleton của Springboot đã lấy thông tin ở trong application.properties để tạo ra nhằm kết nối database.
@@ -159,11 +163,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// /userInfo page requires login as ROLE_USER or ROLE_ADMIN.
 		// If no login, it will redirect to /login page.
 //		http.authorizeRequests().antMatchers("/userInfo").access("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')");
-		http.authorizeRequests().antMatchers("/userInfo").hasAnyRole("ROLE_USER","ROLE_ADMIN");
+		http.authorizeRequests().antMatchers("/userInfo").hasAnyRole("USER","ADMIN"); //bỏ phần "ROLE_" trong "ROLE_USER"
 
 		// For ADMIN only.
-//		http.authorizeRequests().antMatchers("/admin").access("hasRole('ROLE_ADMIN')");
-		http.authorizeRequests().antMatchers("/admin").hasAnyRole("ROLE_ADMIN");
+//		http.authorizeRequests().antMatchers("/admin").access("hasRole('ROLE_ADMIN')"); 
+		http.authorizeRequests().antMatchers("/admin").hasAnyRole("ADMIN"); //bỏ phần "ROLE_" trong "ROLE_ADMIN"
 
 		// When the user has logged in as XX.
 		// But access a page that requires role YY,
