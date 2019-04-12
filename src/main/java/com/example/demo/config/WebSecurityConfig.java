@@ -121,7 +121,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(userDetailsService)
 		    .passwordEncoder(passwordEncoder());
 
-		System.out.println(" ************** step2: WebSecurityConfig " );
+		System.out.println(" ************** step1: WebSecurityConfig " );
 	}
 
 /*	// for testing => để tránh việc thiết kế database
@@ -147,7 +147,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		System.out.println(" ************** step3: WebSecurityConfig " );
+		System.out.println(" ************** step2: WebSecurityConfig " );
 
 		/**
 		 * HttpSecurity  sẽ đóng vai trò interceptor và xử lý các vấn để security
