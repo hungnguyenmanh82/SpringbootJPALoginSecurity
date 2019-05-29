@@ -16,6 +16,8 @@ import org.springframework.web.filter.GenericFilterBean;
  * Có thể dùng wraper response/request giống hệt filter ở Servlet.
  * 
  * Bỏ source code filter thì Springboot Security vẫn chạy tốt.
+ * 
+ * Filter đc add vào ở phần trc Security hay sau security là tùy.
  *
  */
 public class CustomFilter extends GenericFilterBean {
